@@ -1,0 +1,42 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "MediClinic";
+}
+
+<div class="mc-hero">
+    <h1>MediClinic</h1>
+    <p>Sistem integrat de management al clinicii medicale. Programări, dosare medicale și resurse — totul într-un singur loc.</p>
+    <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary btn-lg me-2">Autentificare</a>
+    <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-primary btn-lg">Înregistrare Pacient</a>
+</div>
+
+<div class="row g-4 mt-2">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center p-4">
+                <div style="font-size:2.5rem;margin-bottom:0.75rem;">📅</div>
+                <h5 class="fw-semibold mb-2">Programări Online</h5>
+                <p class="text-muted" style="font-size:0.9rem;">Programează consultații rapid și simplu, direct din platformă.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center p-4">
+                <div style="font-size:2.5rem;margin-bottom:0.75rem;">📋</div>
+                <h5 class="fw-semibold mb-2">Dosar Medical Digital</h5>
+                <p class="text-muted" style="font-size:0.9rem;">Acces securizat la istoricul medical, analize și tratamente.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center p-4">
+                <div style="font-size:2.5rem;margin-bottom:0.75rem;">🔬</div>
+                <h5 class="fw-semibold mb-2">Resurse & Echipamente</h5>
+                <p class="text-muted" style="font-size:0.9rem;">Gestionare eficientă a sălilor și echipamentelor medicale.</p>
+            </div>
+        </div>
+    </div>
+</div>

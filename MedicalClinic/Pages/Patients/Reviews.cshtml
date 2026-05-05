@@ -1,0 +1,110 @@
+@page
+@model MedicalClinic.Pages.Patients.ReviewsModel
+@{
+    ViewData["Title"] = "Recenzii";
+}
+
+<div class="mc-page-header">
+    <h2>Recenzii Doctori</h2>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.SuccessMessage))
+{
+    <div class="alert alert-success mb-4">@Model.SuccessMessage</div>
+}
+
+<p class="mc-section-title">Consultații Finalizate — Adaugă Recenzie</p>
+@if (Model.CompletedAppointments.Any())
+{
+    <div class="mc-table-wrapper mb-4">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Doctor</th>
+                    <th>Tip Consultație</th>
+                    <th>Recenzie</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var a in Model.CompletedAppointments)
+                {
+                    <tr>
+                        <td class="fw-medium">@a.StartTime.ToString("dd/MM/yyyy")</td>
+                        <td>@a.Doctor.Name</td>
+                        <td class="text-muted">@a.ConsultationType.Name</td>
+                        <td>
+                            @if (Model.ReviewedAppointmentIds.Contains(a.AppointmentId))
+                            {
+                                <span class="badge bg-success">Recenzie adăugată</span>
+                            }
+                            else
+                            {
+                                <form method="post">
+                                    <input type="hidden" name="DoctorId" value="@a.DoctorId" />
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                                        <select name="Score" class="form-select form-select-sm" style="width:auto">
+                                            <option value="5">★★★★★ (5)</option>
+                                            <option value="4">★★★★☆ (4)</option>
+                                            <option value="3">★★★☆☆ (3)</option>
+                                            <option value="2">★★☆☆☆ (2)</option>
+                                            <option value="1">★☆☆☆☆ (1)</option>
+                                        </select>
+                                        <input type="text" name="Comment" class="form-control form-control-sm" placeholder="Comentariu (opțional)" style="min-width:160px" />
+                                        <div class="form-check mb-0">
+                                            <input type="checkbox" name="IsAnonymous" value="true" class="form-check-input" id="anon_@a.AppointmentId" />
+                                            <label class="form-check-label" for="anon_@a.AppointmentId" style="font-size:0.83rem">Anonim</label>
+                                        </div>
+                                        <button type="submit" class="btn btn-sm btn-primary">Trimite</button>
+                                    </div>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info mb-4">Nu ai consultații finalizate încă.</div>
+}
+
+<p class="mc-section-title">Recenziile Mele</p>
+@if (Model.MyReviews.Any())
+{
+    <div class="mc-table-wrapper mb-4">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>Doctor</th>
+                    <th>Rating</th>
+                    <th>Comentariu</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model.MyReviews)
+                {
+                    <tr>
+                        <td class="fw-medium">@r.Doctor.Name</td>
+                        <td class="mc-stars">@string.Concat(Enumerable.Repeat("★", r.Score))@string.Concat(Enumerable.Repeat("☆", 5 - r.Score))</td>
+                        <td class="text-muted">@(r.IsAnonymous ? "Anonim" : r.Comment)</td>
+                        <td>
+                            <span class="badge @(r.IsApproved ? "bg-success" : "bg-warning")">
+                                @(r.IsApproved ? "Aprobat" : "În așteptare")
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">Nu ai adăugat recenzii încă.</div>
+}
+
+<a href="/Patients/Dashboard" class="btn btn-secondary">Înapoi</a>

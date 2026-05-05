@@ -1,0 +1,80 @@
+@page
+@model MedicalClinic.Pages.Admin.ConsultationTypesModel
+@{
+    ViewData["Title"] = "Tipuri de Consultație";
+}
+
+<div class="mc-page-header">
+    <h2>Tipuri de Consultație</h2>
+    <a href="/Admin/Dashboard" class="btn btn-secondary">← Înapoi</a>
+</div>
+
+<div class="mc-add-row mb-4">
+    <p class="mc-section-title mb-2">Adaugă tip consultație nou</p>
+    <form method="post">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Nume consultație</label>
+                <input asp-for="NewName" class="form-control" placeholder="ex: Consultație inițială" />
+                <span asp-validation-for="NewName" class="text-danger"></span>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Specialitate</label>
+                <select asp-for="NewSpecialityId" class="form-select"
+                        asp-items="@(new SelectList(Model.Specialities, "SpecialityId", "Name"))">
+                    <option value="">— Selectează specialitatea —</option>
+                </select>
+                <span asp-validation-for="NewSpecialityId" class="text-danger"></span>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Durată (min)</label>
+                <input asp-for="NewDuration" class="form-control" type="number" min="5" placeholder="30" />
+                <span asp-validation-for="NewDuration" class="text-danger"></span>
+            </div>
+            <div class="col-md-2 d-flex align-items-end pb-1">
+                <div class="form-check">
+                    <input asp-for="NewRequiresNurse" class="form-check-input" type="checkbox" />
+                    <label asp-for="NewRequiresNurse" class="form-check-label fw-medium" style="font-size:0.88rem">Necesită asistentă</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Adaugă</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="mc-table-wrapper">
+    <table class="table table-striped mb-0">
+        <thead>
+            <tr>
+                <th>Nume</th>
+                <th>Specialitate</th>
+                <th>Durată</th>
+                <th>Asistentă</th>
+                <th style="width:100px">Acțiuni</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in Model.ConsultationTypes)
+            {
+                <tr>
+                    <td class="fw-medium">@c.Name</td>
+                    <td class="text-muted">@c.Speciality.Name</td>
+                    <td>@c.Duration min</td>
+                    <td>
+                        <span class="badge @(c.RequiresNurse ? "bg-warning" : "bg-secondary")">
+                            @(c.RequiresNurse ? "Necesară" : "Nu")
+                        </span>
+                    </td>
+                    <td>
+                        <form method="post" asp-page-handler="Delete">
+                            <input type="hidden" name="id" value="@c.ConsultationTypeId" />
+                            <button type="submit" class="btn btn-sm btn-danger">Șterge</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

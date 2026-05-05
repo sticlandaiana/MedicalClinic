@@ -1,0 +1,18 @@
+@page
+@{
+    ViewData["Title"] = "Cont Blocat";
+}
+
+<div class="mc-login-outer">
+    <div class="mc-login-card text-center">
+        <div class="mc-login-logo">
+            <div class="mc-logo-mark">🔒</div>
+            <h2>Cont Blocat Temporar</h2>
+        </div>
+        <div class="alert alert-danger mb-4">
+            Contul tău a fost blocat temporar după prea multe încercări eșuate de autentificare (5.3 — Politică Securitate).
+        </div>
+        <p class="text-muted mb-4">Încearcă din nou mai târziu sau resetează-ți parola.</p>
+        <a asp-page="./ForgotPassword" class="btn btn-primary">Resetează Parola</a>
+    </div>
+</div>

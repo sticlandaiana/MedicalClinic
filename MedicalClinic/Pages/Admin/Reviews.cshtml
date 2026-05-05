@@ -1,0 +1,56 @@
+@page
+@model MedicalClinic.Pages.Admin.ReviewsModel
+@{
+    ViewData["Title"] = "Moderare Recenzii";
+}
+
+<div class="mc-page-header">
+    <h2>Moderare Recenzii</h2>
+    <a href="/Admin/Dashboard" class="btn btn-secondary">← Înapoi</a>
+</div>
+
+<div class="mc-table-wrapper">
+    <table class="table table-striped mb-0">
+        <thead>
+            <tr>
+                <th>Pacient</th>
+                <th>Doctor</th>
+                <th>Rating</th>
+                <th>Comentariu</th>
+                <th>Status</th>
+                <th>Acțiuni</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model.Reviews)
+            {
+                <tr>
+                    <td class="fw-medium">@(r.IsAnonymous ? "Anonim" : r.Patient.Name)</td>
+                    <td class="text-muted">@r.Doctor.Name</td>
+                    <td class="mc-stars">@string.Concat(Enumerable.Repeat("★", r.Score))@string.Concat(Enumerable.Repeat("☆", 5 - r.Score))</td>
+                    <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">@r.Comment</td>
+                    <td>
+                        <span class="badge @(r.IsApproved ? "bg-success" : "bg-warning")">
+                            @(r.IsApproved ? "Aprobat" : "În așteptare")
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-group">
+                            @if (!r.IsApproved)
+                            {
+                                <form method="post" asp-page-handler="Approve">
+                                    <input type="hidden" name="id" value="@r.ReviewId" />
+                                    <button type="submit" class="btn btn-sm btn-success">Aprobă</button>
+                                </form>
+                            }
+                            <form method="post" asp-page-handler="Delete">
+                                <input type="hidden" name="id" value="@r.ReviewId" />
+                                <button type="submit" class="btn btn-sm btn-danger">Șterge</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

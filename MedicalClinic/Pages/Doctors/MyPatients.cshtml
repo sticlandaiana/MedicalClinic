@@ -1,0 +1,36 @@
+@page
+@model MedicalClinic.Pages.Doctors.MyPatientsModel
+@{
+    ViewData["Title"] = "Pacienții Mei";
+}
+
+<div class="mc-page-header">
+    <h2>Pacienții Mei</h2>
+    <a href="/Doctors/Dashboard" class="btn btn-secondary">← Înapoi</a>
+</div>
+
+<div class="mc-table-wrapper">
+    <table class="table table-striped mb-0">
+        <thead>
+            <tr>
+                <th>Nume Pacient</th>
+                <th>Nr. Consultații</th>
+                <th style="width:140px">Acțiuni</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model.Patients)
+            {
+                <tr>
+                    <td class="fw-medium">@p.Name</td>
+                    <td>
+                        <span class="badge bg-primary">@p.Appointments.Count</span>
+                    </td>
+                    <td>
+                        <a href="/Doctors/PatientRecord?patientId=@p.PatientId" class="btn btn-sm btn-primary">📋 Vezi Dosar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

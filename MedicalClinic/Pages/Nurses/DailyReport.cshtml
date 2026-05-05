@@ -1,0 +1,61 @@
+@page
+@model MedicalClinic.Pages.Nurses.DailyReportModel
+@{
+    ViewData["Title"] = "Raport Zilnic";
+}
+
+<div class="mc-page-header">
+    <div>
+        <h2>Raport Zilnic</h2>
+        <p class="text-muted mb-0" style="font-size:0.88rem">@DateTime.Now.ToString("dddd, dd MMMM yyyy")</p>
+    </div>
+    <a href="/Nurses/Dashboard" class="btn btn-secondary">Înapoi</a>
+</div>
+
+<div class="card mb-4" style="border-left:4px solid var(--mc-primary) !important">
+    <div class="card-body py-3">
+        <span class="mc-section-title">Total pacienți așteptați</span>
+        <span class="badge bg-primary ms-2" style="font-size:1rem;padding:0.4em 0.8em">@Model.Appointments.Count</span>
+    </div>
+</div>
+
+@if (Model.Appointments.Any())
+{
+    <div class="mc-table-wrapper">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>Ora</th>
+                    <th>Pacient</th>
+                    <th>Doctor</th>
+                    <th>Tip Consultație</th>
+                    <th>Sală</th>
+                    <th>Asistentă</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var a in Model.Appointments)
+                {
+                    <tr>
+                        <td class="fw-semibold">@a.StartTime.ToString("HH:mm")</td>
+                        <td class="fw-medium">@a.Patient.Name</td>
+                        <td class="text-muted">@a.Doctor.Name</td>
+                        <td class="text-muted">@a.ConsultationType.Name</td>
+                        <td class="text-muted">@a.Room.Name</td>
+                        <td class="text-muted">@(a.Nurse?.Name ?? "—")</td>
+                        <td>
+                            <span class="badge @(a.Status == "Scheduled" ? "bg-primary" : a.Status == "Completed" ? "bg-success" : a.Status == "Cancelled" ? "bg-danger" : "bg-warning")">
+                                @(a.Status == "Scheduled" ? "Programat" : a.Status == "Completed" ? "Finalizat" : a.Status == "Cancelled" ? "Anulat" : a.Status)
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">Nu există programări pentru astăzi.</div>
+}

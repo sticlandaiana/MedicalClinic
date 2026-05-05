@@ -1,0 +1,30 @@
+@page
+@model MedicalClinic.Pages.Doctors.DashboardModel
+@{
+    ViewData["Title"] = "Dashboard Doctor";
+}
+
+<div class="mc-welcome-banner">
+    <h1>Bun venit, Doctor!</h1>
+    <p>Gestionează programările tale și dosarele medicale ale pacienților.</p>
+</div>
+
+<p class="mc-section-title">Acțiuni rapide</p>
+<div class="mc-dashboard">
+    <a href="/Shared/Calendar" class="mc-dash-card">
+        <span class="mc-dash-icon">📅</span>
+        <span class="mc-dash-label">Calendar Programări</span>
+    </a>
+    <a href="/Doctors/MyAppointments" class="mc-dash-card">
+        <span class="mc-dash-icon">🗓️</span>
+        <span class="mc-dash-label">Lista Programărilor</span>
+    </a>
+    <a href="/Doctors/MyPatients" class="mc-dash-card">
+        <span class="mc-dash-icon">👥</span>
+        <span class="mc-dash-label">Pacienții Mei</span>
+    </a>
+    <a href="/Doctors/MyProfile" class="mc-dash-card">
+        <span class="mc-dash-icon">👤</span>
+        <span class="mc-dash-label">Profilul Meu</span>
+    </a>
+</div>
