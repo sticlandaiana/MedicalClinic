@@ -1,0 +1,132 @@
+@page
+@model MedicalClinic.Pages.Shared.CalendarModel
+@{
+    ViewData["Title"] = "Calendar Programări";
+}
+
+<div class="mc-page-header">
+    <h2>📅 Calendar Programări</h2>
+    <div class="d-flex gap-2">
+        <select id="viewMode" class="form-select form-select-sm" style="width:auto">
+            <option value="day">Zilnic</option>
+            <option value="week" selected>Săptămânal</option>
+            <option value="month">Lunar</option>
+        </select>
+        @if (User.IsInRole("Administrator"))
+        {
+            <a href="/Admin/Dashboard" class="btn btn-secondary btn-sm">← Înapoi</a>
+        }
+        else if (User.IsInRole("Doctor"))
+        {
+            <a href="/Doctors/Dashboard" class="btn btn-secondary btn-sm">← Înapoi</a>
+        }
+        else if (User.IsInRole("Nurse"))
+        {
+            <a href="/Nurses/Dashboard" class="btn btn-secondary btn-sm">← Înapoi</a>
+        }
+    </div>
+</div>
+
+<div class="mc-add-row mb-4">
+    <form method="get" id="filterForm">
+        <div class="row g-3 align-items-end">
+            @if (User.IsInRole("Admin") || User.IsInRole("Administrator"))
+            {
+                <div class="col-md-3">
+                    <label class="form-label">Doctor</label>
+                    <select name="doctorId" class="form-select" onchange="document.getElementById('filterForm').submit()">
+                        <option value="">— Toți doctorii —</option>
+                        @foreach (var d in Model.Doctors)
+                        {
+                            <option value="@d.DoctorId" selected="@(Model.FilterDoctorId == d.DoctorId)">@d.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Sală / Resursă</label>
+                    <select name="roomId" class="form-select" onchange="document.getElementById('filterForm').submit()">
+                        <option value="">— Toate sălile —</option>
+                        @foreach (var r in Model.Rooms)
+                        {
+                            <option value="@r.RoomId" selected="@(Model.FilterRoomId == r.RoomId)">@r.Name</option>
+                        }
+                    </select>
+                </div>
+            }
+            <div class="col-md-3">
+                <label class="form-label">Specialitate</label>
+                <select name="specialityId" class="form-select" onchange="document.getElementById('filterForm').submit()">
+                    <option value="">— Toate specialitățile —</option>
+                    @foreach (var s in Model.Specialities)
+                    {
+                        <option value="@s.SpecialityId" selected="@(Model.FilterSpecialityId == s.SpecialityId)">@s.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <a href="?" class="btn btn-secondary w-100">Resetează</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body p-0">
+        <div id="calendar" style="min-height:600px; padding:1rem;"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.11/index.global.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.11/index.global.min.js"></script>
+    <script>
+        const appointments = @Html.Raw(Model.AppointmentsJson);
+
+        document.addEventListener('DOMContentLoaded', function () {
+        const calendarEl = document.getElementById('calendar');
+
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'timeGridWeek',
+        locale: 'ro',
+        headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        buttonText: {
+        today: 'Azi',
+        month: 'Lună',
+        week: 'Săptămână',
+        day: 'Zi'
+        },
+        slotMinTime: '07:00:00',
+        slotMaxTime: '20:00:00',
+        allDaySlot: false,
+        nowIndicator: true,
+        events: appointments,
+        eventClick: function (info) {
+        alert(
+        'Pacient: ' + info.event.extendedProps.patient + '\n' +
+        'Doctor: ' + info.event.extendedProps.doctor + '\n' +
+        'Sală: ' + info.event.extendedProps.room + '\n' +
+        'Status: ' + info.event.extendedProps.status
+        );
+        },
+        eventColor: '#0A6EBD',
+        eventDidMount: function (info) {
+        const status = info.event.extendedProps.status;
+        if (status === 'Cancelled') info.el.style.backgroundColor = '#D94F3D';
+        else if (status === 'Completed') info.el.style.backgroundColor = '#1A9E6E';
+        else if (status === 'NeedsRescheduling') info.el.style.backgroundColor = '#E8A900';
+        }
+        });
+
+        calendar.render();
+
+        document.getElementById('viewMode')?.addEventListener('change', function () {
+        const map = { day: 'timeGridDay', week: 'timeGridWeek', month: 'dayGridMonth' };
+        calendar.changeView(map[this.value]);
+        });
+        });
+    </script>
+}

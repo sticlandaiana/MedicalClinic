@@ -1,0 +1,52 @@
+@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Înregistrare Pacient";
+}
+
+<div class="mc-login-outer">
+    <div class="mc-login-card">
+        <div class="mc-login-logo">
+            <div class="mc-logo-mark">🏥</div>
+            <h2>MediClinic</h2>
+            <p>Creează cont de pacient</p>
+        </div>
+
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        <form id="registerForm" method="post">
+            <div class="mb-3">
+                <label asp-for="Input.FullName" class="form-label">Nume Complet</label>
+                <input asp-for="Input.FullName" class="form-control" placeholder="ex: Ion Popescu" autocomplete="name" />
+                <span asp-validation-for="Input.FullName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Email" class="form-label">Adresă Email</label>
+                <input asp-for="Input.Email" class="form-control" placeholder="email@exemplu.ro" autocomplete="username" />
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Password" class="form-label">Parolă</label>
+                <input asp-for="Input.Password" class="form-control" type="password"
+                       placeholder="Minim 10 caractere" autocomplete="new-password" />
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+                <small class="text-muted">Minim 10 caractere, cu majusculă, cifră și caracter special.</small>
+            </div>
+            <div class="mb-4">
+                <label asp-for="Input.ConfirmPassword" class="form-label">Confirmă Parola</label>
+                <input asp-for="Input.ConfirmPassword" class="form-control" type="password"
+                       placeholder="Repetă parola" autocomplete="new-password" />
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+            <button id="registerSubmit" type="submit" class="w-100 btn btn-primary btn-lg mb-3">Creează Cont</button>
+            <p class="text-center mb-0" style="font-size:0.88rem;color:var(--mc-text-muted)">
+                Ai deja cont?
+                <a asp-page="./Login" style="color:var(--mc-primary);font-weight:600">Autentifică-te</a>
+            </p>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

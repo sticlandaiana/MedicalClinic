@@ -1,0 +1,73 @@
+@page
+@model MedicalClinic.Pages.Admin.NurseDoctorAssignmentsModel
+@{
+    ViewData["Title"] = "Dependențe Asistentă–Doctor";
+}
+
+<div class="mc-page-header">
+    <h2>Dependențe Asistentă – Doctor</h2>
+    <a href="/Admin/Dashboard" class="btn btn-secondary">← Înapoi</a>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.SuccessMessage))
+{
+    <div class="alert alert-success mb-4">@Model.SuccessMessage</div>
+}
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger mb-4">@Model.ErrorMessage</div>
+}
+
+<div class="mc-add-row mb-4">
+    <p class="mc-section-title mb-2">Asignează asistentă la doctor</p>
+    <form method="post">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Asistentă</label>
+                <select asp-for="SelectedNurseId" class="form-select"
+                        asp-items="@(new SelectList(Model.Nurses, "NurseId", "Name"))">
+                    <option value="">— Selectează asistenta —</option>
+                </select>
+                <span asp-validation-for="SelectedNurseId" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Doctor</label>
+                <select asp-for="SelectedDoctorId" class="form-select"
+                        asp-items="@(new SelectList(Model.Doctors, "DoctorId", "Name"))">
+                    <option value="">— Selectează doctorul —</option>
+                </select>
+                <span asp-validation-for="SelectedDoctorId" class="text-danger"></span>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Asignează</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="mc-table-wrapper">
+    <table class="table table-striped mb-0">
+        <thead>
+            <tr>
+                <th>Asistentă</th>
+                <th>Doctor</th>
+                <th style="width:100px">Acțiuni</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var a in Model.Assignments)
+            {
+                <tr>
+                    <td class="fw-medium">@a.Nurse.Name</td>
+                    <td class="text-muted">@a.Doctor.Name</td>
+                    <td>
+                        <form method="post" asp-page-handler="Delete">
+                            <input type="hidden" name="id" value="@a.NurseDoctorAssignmentId" />
+                            <button type="submit" class="btn btn-sm btn-danger">Șterge</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

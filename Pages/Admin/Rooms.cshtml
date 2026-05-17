@@ -1,0 +1,105 @@
+@page
+@model MedicalClinic.Pages.Admin.RoomsModel
+@{
+    ViewData["Title"] = "Săli Medicale";
+}
+
+<div class="mc-page-header">
+    <h2>Săli Medicale</h2>
+    <a href="/Admin/Dashboard" class="btn btn-secondary">← Înapoi</a>
+</div>
+
+<div class="mc-add-row mb-3">
+    <p class="mc-section-title mb-2">Adaugă sală nouă</p>
+    <form method="post">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Nume sală</label>
+                <input asp-for="NewRoomName" class="form-control" placeholder="ex: Cabinet Cardiologie 1" />
+                <span asp-validation-for="NewRoomName" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Restricție specialitate</label>
+                <select asp-for="NewRoomSpecialityId" class="form-select"
+                        asp-items="@(new SelectList(Model.Specialities, "SpecialityId", "Name"))">
+                    <option value="">— Fără restricție —</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Adaugă</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="mc-add-row mb-4" style="background:#fff">
+    <form method="get">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Filtrează status</label>
+                <select name="filterStatus" class="form-select">
+                    <option value="">— Toate —</option>
+                    <option value="Available" selected="@(Model.FilterStatus == "Available")">Disponibile</option>
+                    <option value="Unavailable" selected="@(Model.FilterStatus == "Unavailable")">Indisponibile</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Filtrează specialitate</label>
+                <select name="filterSpecialityId" class="form-select">
+                    <option value="">— Toate —</option>
+                    @foreach (var s in Model.Specialities)
+                    {
+                        <option value="@s.SpecialityId" selected="@(Model.FilterSpecialityId == s.SpecialityId)">@s.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filtrează</button>
+            </div>
+            <div class="col-md-2">
+                <a href="/Admin/Rooms" class="btn btn-secondary w-100">Resetează</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="mc-table-wrapper">
+    <table class="table table-striped mb-0">
+        <thead>
+            <tr>
+                <th>Nume</th>
+                <th>Specialitate</th>
+                <th>Status</th>
+                <th>Acțiuni</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model.Rooms)
+            {
+                <tr>
+                    <td class="fw-medium">@r.Name</td>
+                    <td class="text-muted">@(r.Speciality?.Name ?? "Orice specialitate")</td>
+                    <td>
+                        <span class="badge @(r.Status == "Available" ? "bg-success" : "bg-danger")">
+                            @(r.Status == "Available" ? "Disponibilă" : "Indisponibilă")
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-group">
+                            <form method="post" asp-page-handler="ToggleStatus">
+                                <input type="hidden" name="id" value="@r.RoomId" />
+                                <button type="submit" class="btn btn-sm btn-warning">
+                                    @(r.Status == "Available" ? "Dezactivează" : "Activează")
+                                </button>
+                            </form>
+                            <form method="post" asp-page-handler="Delete">
+                                <input type="hidden" name="id" value="@r.RoomId" />
+                                <button type="submit" class="btn btn-sm btn-danger">Șterge</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

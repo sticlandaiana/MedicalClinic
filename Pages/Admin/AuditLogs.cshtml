@@ -1,0 +1,67 @@
+@page
+@model MedicalClinic.Pages.Admin.AuditLogsModel
+@{
+    ViewData["Title"] = "Audit Log";
+}
+
+<div class="mc-page-header">
+    <h2>Audit Log</h2>
+    <a href="/Admin/Dashboard" class="btn btn-secondary">← Înapoi</a>
+</div>
+
+<div class="mc-add-row mb-4">
+    <form method="get">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Filtrează după acțiune</label>
+                <select name="action" class="form-select">
+                    <option value="">— Toate —</option>
+                    <option value="Create" selected="@(Model.FilterAction == "Create")">Create</option>
+                    <option value="Update" selected="@(Model.FilterAction == "Update")">Update</option>
+                    <option value="Delete" selected="@(Model.FilterAction == "Delete")">Delete</option>
+                    <option value="Login" selected="@(Model.FilterAction == "Login")">Login</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Filtrează după entitate</label>
+                <input type="text" name="entity" value="@Model.FilterEntity" class="form-control" placeholder="ex: Appointment" />
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filtrează</button>
+            </div>
+            <div class="col-md-2">
+                <a href="/Admin/AuditLogs" class="btn btn-secondary w-100">Resetează</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="mc-table-wrapper">
+    <table class="table table-striped mb-0">
+        <thead>
+            <tr>
+                <th>Data & Ora</th>
+                <th>Utilizator</th>
+                <th>Acțiune</th>
+                <th>Entitate</th>
+                <th>Detalii</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var log in Model.Logs)
+            {
+                <tr>
+                    <td class="fw-medium" style="white-space:nowrap">@log.Timestamp.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                    <td class="text-muted" style="font-size:0.85rem">@log.UserEmail</td>
+                    <td>
+                        <span class="badge @(log.Action == "Delete" ? "bg-danger" : log.Action == "Create" ? "bg-success" : log.Action == "Login" ? "bg-primary" : "bg-warning")">
+                            @log.Action
+                        </span>
+                    </td>
+                    <td class="text-muted">@log.EntityType</td>
+                    <td style="font-size:0.85rem">@log.Details</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

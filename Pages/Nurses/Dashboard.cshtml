@@ -1,0 +1,26 @@
+@page
+@model MedicalClinic.Pages.Nurses.DashboardModel
+@{
+    ViewData["Title"] = "Dashboard Asistentă";
+}
+
+<div class="mc-welcome-banner">
+    <h1>Bun venit, Asistentă!</h1>
+    <p>Gestionează programările pacienților și rapoartele zilnice.</p>
+</div>
+
+<p class="mc-section-title">Acțiuni rapide</p>
+<div class="mc-dashboard">
+    <a href="/Shared/Calendar" class="mc-dash-card">
+        <span class="mc-dash-icon">📅</span>
+        <span class="mc-dash-label">Calendar Programări</span>
+    </a>
+    <a href="/Nurses/Appointments" class="mc-dash-card">
+        <span class="mc-dash-icon">🗓️</span>
+        <span class="mc-dash-label">Gestionare Programări</span>
+    </a>
+    <a href="/Nurses/DailyReport" class="mc-dash-card">
+        <span class="mc-dash-icon">📊</span>
+        <span class="mc-dash-label">Raport Zilnic</span>
+    </a>
+</div>

@@ -1,0 +1,147 @@
+@page
+@model MedicalClinic.Pages.Patients.MyRecordModel
+@{
+    ViewData["Title"] = "Dosarul Meu Medical";
+}
+
+<div class="mc-page-header">
+    <h2>Dosarul Meu Medical</h2>
+    <a href="?handler=ExportPdf" class="btn btn-danger">📄 Descarcă PDF</a>
+</div>
+
+@if (Model.Allergies.Any())
+{
+    <div class="alert alert-danger mb-4">
+        <strong>⚠️ ALERGII CUNOSCUTE:</strong>
+        @foreach (var a in Model.Allergies)
+        {
+            <span class="badge bg-danger ms-1">@a.Description @(a.IsCritical ? "(CRITIC)" : "")</span>
+        }
+    </div>
+}
+
+<p class="mc-section-title">Istoric Consultații</p>
+@if (Model.Records.Any())
+{
+    <div class="mc-table-wrapper mb-4">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Doctor</th>
+                    <th>Diagnostic</th>
+                    <th>Tensiune</th>
+                    <th>Greutate</th>
+                    <th>Temperatură</th>
+                    <th>Note</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model.Records)
+                {
+                    <tr>
+                        <td class="fw-medium">@r.Appointment.StartTime.ToString("dd/MM/yyyy")</td>
+                        <td>@r.Doctor.Name</td>
+                        <td>@r.Diagnoses</td>
+                        <td>@r.BloodPressure</td>
+                        <td>@r.Weight kg</td>
+                        <td>@r.Temperature °C</td>
+                        <td class="text-muted">@r.Notes</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <p class="mc-section-title">Evoluție Indicatori</p>
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <canvas id="weightChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <canvas id="temperatureChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <canvas id="bloodPressureChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">Nu există înregistrări medicale încă.</div>
+}
+
+<p class="mc-section-title">Documente Externe</p>
+@if (Model.ExternalDocuments.Any())
+{
+    <div class="mc-table-wrapper mb-4">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Tip Document</th>
+                    <th style="width:120px">Acțiuni</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var d in Model.ExternalDocuments)
+                {
+                    <tr>
+                        <td class="fw-medium">@d.DocumentType</td>
+                        <td>
+                            <a href="@d.FilePath" target="_blank" class="btn btn-sm btn-outline-primary">Vezi</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">Nu există documente externe.</div>
+}
+
+<a href="/Patients/Dashboard" class="btn btn-secondary">Înapoi</a>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script>
+        const labels = [@Html.Raw(string.Join(",", Model.Records.Select(r => $"'{r.Appointment.StartTime:dd/MM}'").Reverse()))];
+        const weights = [@Html.Raw(string.Join(",", Model.Records.Select(r => r.Weight).Reverse()))];
+        const temperatures = [@Html.Raw(string.Join(",", Model.Records.Select(r => r.Temperature).Reverse()))];
+        const systolic = [@Html.Raw(string.Join(",", Model.Records.Select(r => {
+            var parts = r.BloodPressure?.Split('/');
+            return (parts != null && parts.Length == 2 && int.TryParse(parts[0], out int v)) ? v : 0;
+        }).Reverse()))];
+
+        const chartDefaults = { responsive: true, plugins: { legend: { position: 'top' } } };
+
+        new Chart(document.getElementById('weightChart'), {
+            type: 'line',
+            data: { labels, datasets: [{ label: 'Greutate (kg)', data: weights, borderColor: '#0A6EBD', backgroundColor: 'rgba(10,110,189,0.08)', tension: 0.3, fill: true }] },
+            options: chartDefaults
+        });
+        new Chart(document.getElementById('temperatureChart'), {
+            type: 'line',
+            data: { labels, datasets: [{ label: 'Temperatură (°C)', data: temperatures, borderColor: '#D94F3D', backgroundColor: 'rgba(217,79,61,0.08)', tension: 0.3, fill: true }] },
+            options: chartDefaults
+        });
+        new Chart(document.getElementById('bloodPressureChart'), {
+            type: 'line',
+            data: { labels, datasets: [{ label: 'Tensiune Sistolică', data: systolic, borderColor: '#1A9E6E', backgroundColor: 'rgba(26,158,110,0.08)', tension: 0.3, fill: true }] },
+            options: chartDefaults
+        });
+    </script>
+}

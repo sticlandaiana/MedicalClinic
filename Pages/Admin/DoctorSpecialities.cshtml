@@ -1,0 +1,64 @@
+@page
+@model MedicalClinic.Pages.Admin.DoctorSpecialitiesModel
+@{
+    ViewData["Title"] = "Specialități Doctori";
+}
+
+<div class="mc-page-header">
+    <h2>Asignare Specialități Doctori</h2>
+    <a href="/Admin/Dashboard" class="btn btn-secondary">← Înapoi</a>
+</div>
+
+<div class="mc-add-row mb-4">
+    <p class="mc-section-title mb-2">Asignează specialitate nouă</p>
+    <form method="post">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Doctor</label>
+                <select asp-for="SelectedDoctorId" class="form-select"
+                        asp-items="@(new SelectList(Model.Doctors, "DoctorId", "Name"))">
+                    <option value="">— Selectează doctorul —</option>
+                </select>
+                <span asp-validation-for="SelectedDoctorId" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Specialitate</label>
+                <select asp-for="SelectedSpecialityId" class="form-select"
+                        asp-items="@(new SelectList(Model.Specialities, "SpecialityId", "Name"))">
+                    <option value="">— Selectează specialitatea —</option>
+                </select>
+                <span asp-validation-for="SelectedSpecialityId" class="text-danger"></span>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Asignează</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="mc-table-wrapper">
+    <table class="table table-striped mb-0">
+        <thead>
+            <tr>
+                <th>Doctor</th>
+                <th>Specialitate</th>
+                <th style="width:100px">Acțiuni</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ds in Model.DoctorSpecialities)
+            {
+                <tr>
+                    <td class="fw-medium">@ds.Doctor.Name</td>
+                    <td class="text-muted">@ds.Speciality.Name</td>
+                    <td>
+                        <form method="post" asp-page-handler="Delete">
+                            <input type="hidden" name="id" value="@ds.DoctorSpecialityId" />
+                            <button type="submit" class="btn btn-sm btn-danger">Șterge</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

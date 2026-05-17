@@ -1,0 +1,66 @@
+@page
+@model MedicalClinic.Pages.Doctors.AddRecordModel
+@{
+    ViewData["Title"] = "Adaugă Fișă Medicală";
+}
+
+<div class="mc-page-header">
+    <div>
+        <h2>Adaugă Fișă Medicală</h2>
+        <p class="text-muted mb-0" style="font-size:0.88rem">Pacient: <strong>@Model.PatientName</strong> &nbsp;·&nbsp; Data: @Model.AppointmentDate</p>
+    </div>
+    <a href="/Doctors/MyAppointments" class="btn btn-secondary">Înapoi</a>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger mb-4">@Model.ErrorMessage</div>
+}
+
+<div class="mc-form-panel">
+    <form method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="AppointmentId" />
+        <div class="row g-4">
+            <div class="col-md-4">
+                <label class="form-label">Tensiune Arterială</label>
+                <input asp-for="BloodPressure" class="form-control" placeholder="ex: 120/80" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Greutate (kg)</label>
+                <input asp-for="Weight" class="form-control" type="number" step="0.1" placeholder="70.5" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Temperatură (°C)</label>
+                <input asp-for="Temperature" class="form-control" type="number" step="0.1" placeholder="36.6" />
+            </div>
+            <div class="col-md-12">
+                <label class="form-label">Diagnostic</label>
+                <input asp-for="Diagnoses" class="form-control" placeholder="Introduceți diagnosticul..." />
+                <span asp-validation-for="Diagnoses" class="text-danger"></span>
+            </div>
+            <div class="col-md-12">
+                <label class="form-label">Note Consultație</label>
+                <textarea asp-for="Notes" class="form-control" rows="4" placeholder="Observații, recomandări, tratament prescris..."></textarea>
+            </div>
+            <div class="col-md-12 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">💾 Salvează Fișa</button>
+                <a href="/Doctors/MyAppointments" class="btn btn-secondary">Anulează</a>
+            </div>
+        </div>
+    </form>
+
+    @if (!ModelState.IsValid)
+    {
+        <div class="alert alert-danger mt-3">
+            @foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <p class="mb-1">@error.ErrorMessage</p>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

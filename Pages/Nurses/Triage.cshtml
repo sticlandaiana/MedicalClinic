@@ -1,0 +1,85 @@
+@page
+@model MedicalClinic.Pages.Nurses.TriageModel
+@{
+    ViewData["Title"] = "Date Triaj";
+}
+
+<div class="mc-page-header">
+    <div>
+        <h2>Date Triaj</h2>
+        @if (Model.Appointment != null)
+        {
+            <p class="text-muted mb-0" style="font-size:0.88rem">Pacient: <strong>@Model.Appointment.Patient.Name</strong></p>
+        }
+    </div>
+    <a href="/Nurses/Appointments" class="btn btn-secondary">Înapoi</a>
+</div>
+
+@if (Model.Appointment != null)
+{
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <p class="mc-section-title mb-1">Doctor</p>
+                    <p class="fw-medium mb-0">@Model.Appointment.Doctor.Name</p>
+                </div>
+                <div class="col-md-4">
+                    <p class="mc-section-title mb-1">Tip Consultație</p>
+                    <p class="fw-medium mb-0">@Model.Appointment.ConsultationType?.Name</p>
+                </div>
+                <div class="col-md-4">
+                    <p class="mc-section-title mb-1">Data & Ora</p>
+                    <p class="fw-medium mb-0">@Model.Appointment.StartTime.ToString("dd/MM/yyyy HH:mm")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(Model.SuccessMessage))
+{
+    <div class="alert alert-success mb-4">@Model.SuccessMessage</div>
+}
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger mb-4">@Model.ErrorMessage</div>
+}
+@if (Model.AlreadyHasTriageData)
+{
+    <div class="alert alert-info mb-4">
+        <strong>ℹ️</strong> Există deja date de triaj pentru această consultație. Valorile vor fi actualizate.
+    </div>
+}
+
+<div class="mc-form-panel">
+    <h3 style="font-size:1rem;margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px solid var(--mc-border)">🩺 Introducere Date Vitale</h3>
+    <form method="post">
+        <input type="hidden" asp-for="AppointmentId" />
+        <div class="row g-4">
+            <div class="col-md-4">
+                <label class="form-label">Tensiune Arterială</label>
+                <input asp-for="BloodPressure" class="form-control" placeholder="ex: 120/80" />
+                <span asp-validation-for="BloodPressure" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Greutate (kg)</label>
+                <input asp-for="Weight" class="form-control" type="number" step="0.1" placeholder="70.0" />
+                <span asp-validation-for="Weight" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Temperatură (°C)</label>
+                <input asp-for="Temperature" class="form-control" type="number" step="0.1" placeholder="36.6" />
+                <span asp-validation-for="Temperature" class="text-danger"></span>
+            </div>
+            <div class="col-md-12 d-flex gap-2">
+                <button type="submit" class="btn btn-success">💾 Salvează Date Triaj</button>
+                <a href="/Nurses/Appointments" class="btn btn-secondary">Anulează</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
