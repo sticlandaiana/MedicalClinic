@@ -30,6 +30,7 @@ namespace MedicalClinic.Pages.Patients
         public List<MedicalClinic.Models.Doctor> Doctors { get; set; }
         public string SuccessMessage { get; set; }
         public string ErrorMessage { get; set; }
+        public bool PrefilledByAssistant { get; set; }
 
         [BindProperty]
         [Required(ErrorMessage = "Specialitatea este obligatorie")]
@@ -47,9 +48,33 @@ namespace MedicalClinic.Pages.Patients
         [Required(ErrorMessage = "Data și ora sunt obligatorii")]
         public DateTime? SelectedDateTime { get; set; }
 
-        public async Task OnGetAsync()
+        /// <summary>
+        /// Poate primi valori precompletate (ex. de la Asistentul de programare):
+        /// /Patients/BookAppointment?specialityId=1&consultationTypeId=2&doctorId=3&fromAssistant=true
+        /// </summary>
+        public async Task OnGetAsync(int? specialityId, int? consultationTypeId, int? doctorId, bool fromAssistant = false)
         {
             await LoadDataAsync();
+
+            if (specialityId.HasValue && Specialities.Any(s => s.SpecialityId == specialityId.Value))
+            {
+                SelectedSpecialityId = specialityId;
+
+                if (consultationTypeId.HasValue && ConsultationTypes.Any(c =>
+                        c.ConsultationTypeId == consultationTypeId.Value && c.SpecialityId == specialityId.Value))
+                {
+                    SelectedConsultationTypeId = consultationTypeId;
+                }
+
+                if (doctorId.HasValue && Doctors.Any(d =>
+                        d.DoctorId == doctorId.Value &&
+                        d.DoctorSpecialities.Any(ds => ds.SpecialityId == specialityId.Value)))
+                {
+                    SelectedDoctorId = doctorId;
+                }
+
+                PrefilledByAssistant = fromAssistant;
+            }
         }
 
         private async Task LoadDataAsync()

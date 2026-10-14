@@ -3,3 +3,5 @@
 ################################################################################
 
 /MedicalClinic/.vs
+/MedicalClinic/obj
+/MedicalClinic/bin/Debug/net10.0

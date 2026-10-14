@@ -9,6 +9,12 @@
     <a href="/Patients/Dashboard" class="btn btn-secondary">Înapoi</a>
 </div>
 
+@if (Model.PrefilledByAssistant)
+{
+    <div class="alert alert-info">
+        🤖 Am completat câmpurile pe baza recomandării asistentului. Poți modifica orice selecție. Alege data și ora pentru a confirma.
+    </div>
+}
 @if (!string.IsNullOrEmpty(Model.SuccessMessage))
 {
     <div class="alert alert-success">@Model.SuccessMessage</div>
@@ -82,25 +88,41 @@
         const allConsultations = Array.from(consultationSelect.options).slice(1);
         const allDoctors = Array.from(doctorSelect.options).slice(1);
 
-        specialitySelect.addEventListener('change', function () {
-            const selectedId = this.value;
-            consultationSelect.innerHTML = '<option value="">— Selectează tipul —</option>';
-            allConsultations.filter(o => o.dataset.speciality === selectedId).forEach(o => consultationSelect.appendChild(o.cloneNode(true)));
-            doctorSelect.innerHTML = '<option value="">— Selectează doctorul —</option>';
-            allDoctors.filter(o => o.dataset.speciality === selectedId).forEach(o => doctorSelect.appendChild(o.cloneNode(true)));
-            document.getElementById('doctorProfileLink').style.display = 'none';
-        });
+        // Valorile precompletate de server (asistent AI sau reafișare după eroare la POST)
+        const initialConsultation = consultationSelect.value;
+        const initialDoctor = doctorSelect.value;
 
-        doctorSelect.addEventListener('change', function () {
-            const doctorId = this.value;
+        function updateDoctorLink() {
             const profileLink = document.getElementById('doctorProfileLink');
             const link = document.getElementById('profileLink');
-            if (doctorId) {
-                link.href = `/Patients/DoctorProfile?doctorId=${doctorId}`;
+            if (doctorSelect.value) {
+                link.href = `/Patients/DoctorProfile?doctorId=${doctorSelect.value}`;
                 profileLink.style.display = 'block';
             } else {
                 profileLink.style.display = 'none';
             }
-        });
+        }
+
+        function applySpecialityFilter(restoreSelection) {
+            const selectedId = specialitySelect.value;
+            consultationSelect.innerHTML = '<option value="">— Selectează tipul —</option>';
+            allConsultations.filter(o => o.dataset.speciality === selectedId).forEach(o => consultationSelect.appendChild(o.cloneNode(true)));
+            doctorSelect.innerHTML = '<option value="">— Selectează doctorul —</option>';
+            allDoctors.filter(o => o.dataset.speciality === selectedId).forEach(o => doctorSelect.appendChild(o.cloneNode(true)));
+
+            if (restoreSelection) {
+                consultationSelect.value = initialConsultation;
+                doctorSelect.value = initialDoctor;
+            }
+            updateDoctorLink();
+        }
+
+        specialitySelect.addEventListener('change', () => applySpecialityFilter(false));
+        doctorSelect.addEventListener('change', updateDoctorLink);
+
+        // La încărcare: dacă specialitatea e deja aleasă, filtrează listele și păstrează selecțiile
+        if (specialitySelect.value) {
+            applySpecialityFilter(true);
+        }
     </script>
 }

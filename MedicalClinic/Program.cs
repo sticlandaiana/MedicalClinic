@@ -45,6 +45,13 @@ builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<MedicalRecordPdfService>();   // REQ-37, REQ-42
 builder.Services.AddScoped<AuditService>();              // REQ-10
 
+// Asistent AI de programare (Google Gemini API)
+builder.Services.AddMemoryCache();
+builder.Services.Configure<GeminiOptions>(builder.Configuration.GetSection("Gemini"));
+// RemoveAllLoggers: cheia API e în URL și nu trebuie afișată în log-uri
+builder.Services.AddHttpClient<AiSchedulingAssistant>(c => c.Timeout = TimeSpan.FromSeconds(90))
+    .RemoveAllLoggers();
+
 // REQ-6: IEmailSender necesar pentru ForgotPassword / ResetPassword
 builder.Services.AddTransient<IEmailSender, EmailSenderAdapter>();
 

@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace MedicalClinic.Migrations
+namespace MedicalClinic.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class CleanStart : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -51,6 +51,24 @@ namespace MedicalClinic.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AuditLogs",
+                columns: table => new
+                {
+                    AuditLogId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Action = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EntityType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Details = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuditLogs", x => x.AuditLogId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Specialities",
                 columns: table => new
                 {
@@ -87,7 +105,7 @@ namespace MedicalClinic.Migrations
             migrationBuilder.CreateTable(
                 name: "Administrators",
                 columns: table => new
-                {
+                {           
                     AdministratorId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -322,6 +340,32 @@ namespace MedicalClinic.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "NurseDoctorAssignments",
+                columns: table => new
+                {
+                    NurseDoctorAssignmentId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NurseId = table.Column<int>(type: "int", nullable: false),
+                    DoctorId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_NurseDoctorAssignments", x => x.NurseDoctorAssignmentId);
+                    table.ForeignKey(
+                        name: "FK_NurseDoctorAssignments_Doctors_DoctorId",
+                        column: x => x.DoctorId,
+                        principalTable: "Doctors",
+                        principalColumn: "DoctorId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_NurseDoctorAssignments_Nurses_NurseId",
+                        column: x => x.NurseId,
+                        principalTable: "Nurses",
+                        principalColumn: "NurseId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Allergies",
                 columns: table => new
                 {
@@ -408,7 +452,8 @@ namespace MedicalClinic.Migrations
                     Duration = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CancellationReason = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ReminderSent = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -624,6 +669,16 @@ namespace MedicalClinic.Migrations
                 column: "PatientId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_NurseDoctorAssignments_DoctorId",
+                table: "NurseDoctorAssignments",
+                column: "DoctorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_NurseDoctorAssignments_NurseId",
+                table: "NurseDoctorAssignments",
+                column: "NurseId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Nurses_UserId",
                 table: "Nurses",
                 column: "UserId");
@@ -674,6 +729,9 @@ namespace MedicalClinic.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "AuditLogs");
+
+            migrationBuilder.DropTable(
                 name: "DoctorSpecialities");
 
             migrationBuilder.DropTable(
@@ -684,6 +742,9 @@ namespace MedicalClinic.Migrations
 
             migrationBuilder.DropTable(
                 name: "MedicalRecordEntries");
+
+            migrationBuilder.DropTable(
+                name: "NurseDoctorAssignments");
 
             migrationBuilder.DropTable(
                 name: "Reviews");

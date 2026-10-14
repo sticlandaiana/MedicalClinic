@@ -9,18 +9,18 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace MedicalClinic.Migrations
+namespace MedicalClinic.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260424164258_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20261014102426_CleanStart")]
+    partial class CleanStart
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.5")
+                .HasAnnotation("ProductVersion", "10.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -100,6 +100,9 @@ namespace MedicalClinic.Migrations
                     b.Property<int>("PatientId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("ReminderSent")
+                        .HasColumnType("bit");
+
                     b.Property<int>("RoomId")
                         .HasColumnType("int");
 
@@ -123,6 +126,42 @@ namespace MedicalClinic.Migrations
                     b.HasIndex("RoomId");
 
                     b.ToTable("Appointments");
+                });
+
+            modelBuilder.Entity("MedicalClinic.Models.AuditLog", b =>
+                {
+                    b.Property<int>("AuditLogId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AuditLogId"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Details")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EntityType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("AuditLogId");
+
+                    b.ToTable("AuditLogs");
                 });
 
             modelBuilder.Entity("MedicalClinic.Models.ConsultationType", b =>
@@ -329,6 +368,29 @@ namespace MedicalClinic.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Nurses");
+                });
+
+            modelBuilder.Entity("MedicalClinic.Models.NurseDoctorAssignment", b =>
+                {
+                    b.Property<int>("NurseDoctorAssignmentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NurseDoctorAssignmentId"));
+
+                    b.Property<int>("DoctorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NurseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("NurseDoctorAssignmentId");
+
+                    b.HasIndex("DoctorId");
+
+                    b.HasIndex("NurseId");
+
+                    b.ToTable("NurseDoctorAssignments");
                 });
 
             modelBuilder.Entity("MedicalClinic.Models.Patient", b =>
@@ -803,6 +865,25 @@ namespace MedicalClinic.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("MedicalClinic.Models.NurseDoctorAssignment", b =>
+                {
+                    b.HasOne("MedicalClinic.Models.Doctor", "Doctor")
+                        .WithMany("NurseAssignments")
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MedicalClinic.Models.Nurse", "Nurse")
+                        .WithMany("DoctorAssignments")
+                        .HasForeignKey("NurseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Doctor");
+
+                    b.Navigation("Nurse");
+                });
+
             modelBuilder.Entity("MedicalClinic.Models.Patient", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
@@ -912,12 +993,16 @@ namespace MedicalClinic.Migrations
 
                     b.Navigation("MedicalRecords");
 
+                    b.Navigation("NurseAssignments");
+
                     b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("MedicalClinic.Models.Nurse", b =>
                 {
                     b.Navigation("Appointments");
+
+                    b.Navigation("DoctorAssignments");
                 });
 
             modelBuilder.Entity("MedicalClinic.Models.Patient", b =>

@@ -1,0 +1,103 @@
+@page
+@model MedicalClinic.Pages.Patients.AssistantModel
+@{
+    ViewData["Title"] = "Asistent Programare";
+}
+
+<div class="mc-page-header">
+    <h2>🤖 Asistent Programare</h2>
+    <a href="/Patients/Dashboard" class="btn btn-secondary">Înapoi</a>
+</div>
+
+<div class="alert alert-info">
+    Descrie simptomele tale, iar asistentul te va ajuta să alegi specialitatea potrivită și un doctor din clinică.
+    <strong>Asistentul nu pune diagnostic și nu înlocuiește consultul medical.</strong>
+    În caz de urgență sună la <strong>112</strong>.
+</div>
+
+<div class="mc-form-panel mb-4">
+    <form method="post" id="assistantForm">
+        <label class="form-label d-block" for="Symptoms">Ce simptome ai?</label>
+        <textarea asp-for="Symptoms" class="form-control w-100" style="width:100%" rows="4" maxlength="1000"
+                  placeholder="Ex: Mă doare capul de 3 zile și am amețeli, mai ales dimineața."></textarea>
+        <span asp-validation-for="Symptoms" class="text-danger"></span>
+        <div class="mt-3">
+            <button type="submit" id="analyzeBtn" class="btn btn-primary">Analizează simptomele</button>
+        </div>
+    </form>
+</div>
+
+@if (Model.Result != null)
+{
+    var r = Model.Result;
+
+    if (r.IsEmergency)
+    {
+        <div class="alert alert-danger">
+            <h5 class="alert-heading">⚠️ Posibilă urgență medicală</h5>
+            <p class="mb-0">@r.Explanation</p>
+        </div>
+    }
+    else if (r.Error != null)
+    {
+        <div class="alert alert-warning">
+            @r.Error
+            <div class="mt-2">
+                <a href="/Patients/BookAppointment" class="btn btn-sm btn-outline-primary">Programare manuală</a>
+            </div>
+        </div>
+    }
+    else if (r.HasRecommendation)
+    {
+        <div class="mc-form-panel">
+            <h5 class="mb-3">Recomandarea asistentului</h5>
+            @if (r.Urgency == "urgent")
+            {
+                <div class="alert alert-warning py-2">
+                    Ar fi bine să fii consultat în următoarele zile. Alege cel mai apropiat interval disponibil.
+                </div>
+            }
+            <p>@r.Explanation</p>
+            <ul class="list-unstyled mb-3">
+                <li><strong>Specialitate:</strong> @r.SpecialityName</li>
+                @if (r.ConsultationTypeName != null)
+                {
+                    <li><strong>Tip consultație:</strong> @r.ConsultationTypeName</li>
+                }
+                @if (r.DoctorName != null)
+                {
+                    <li><strong>Doctor sugerat:</strong> @r.DoctorName</li>
+                }
+            </ul>
+            <a class="btn btn-primary"
+               asp-page="/Patients/BookAppointment"
+               asp-route-specialityId="@r.SpecialityId"
+               asp-route-consultationTypeId="@r.ConsultationTypeId"
+               asp-route-doctorId="@r.DoctorId"
+               asp-route-fromAssistant="true">📅 Programează-te</a>
+            <small class="d-block text-muted mt-2">
+                Vei putea modifica specialitatea, doctorul sau tipul consultației în pasul următor.
+            </small>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-secondary">
+            @(string.IsNullOrWhiteSpace(r.Explanation)
+                ? "Nu am putut stabili o specialitate. Încearcă să adaugi mai multe detalii despre simptome."
+                : r.Explanation)
+        </div>
+    }
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('assistantForm').addEventListener('submit', function () {
+            if (window.jQuery && !jQuery(this).valid()) return; // nu bloca butonul dacă validarea eșuează
+            const btn = document.getElementById('analyzeBtn');
+            btn.disabled = true;
+            btn.textContent = 'Se analizează...';
+        });
+    </script>
+}
